@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/useAuth";
 import API_URL from "../api";
+
 function AdminOrders() {
-  const [orders, setOrders] = useState([]);
   const { token } = useAuth();
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -17,7 +19,7 @@ function AdminOrders() {
           },
         });
 
-      setOrders(Array.isArray(res.data) ? res.data : []);
+        setOrders(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Fetch orders error:", err);
         toast.error("Failed to load orders");
@@ -26,8 +28,9 @@ function AdminOrders() {
       }
     };
 
-    fetchOrders();
+    if (token) fetchOrders();
   }, [token]);
+
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       const res = await axios.put(
@@ -50,26 +53,7 @@ function AdminOrders() {
       toast.error("Failed to update order status");
     }
   };
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await axios.get("${API_URL}/api/orders", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
 
-        setOrders(res.data);
-      } catch (err) {
-        console.error("Fetch orders error:", err);
-        toast.error("Failed to load orders");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, [token]);
   if (loading) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-8">
@@ -86,6 +70,7 @@ function AdminOrders() {
       </main>
     );
   }
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <Link to="/admin" className="font-semibold text-gray-600 hover:underline">
@@ -109,24 +94,21 @@ function AdminOrders() {
               <div className="flex flex-col gap-4 border-b pb-5 sm:flex-row sm:justify-between">
                 <div>
                   <h2 className="font-extrabold">Order #{order._id}</h2>
-                  <p className="mt-2 text-sm text-gray-500">
-                    {order.customer?.name} •{" "}
-                    {order.customer?.phone || "No phone"}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {order.customer?.address}
-                  </p>
-                  <p className="text-sm text-gray-500 capitalize">
-                    Type: {order.orderType}
-                  </p>
 
-                  <p className="text-sm text-gray-500 capitalize">
-                    Payment: {order.paymentStatus}
-                  </p>
+                  <div className="mt-2 space-y-1 text-sm text-gray-500">
+                    <p>
+                      {order.customer?.name} •{" "}
+                      {order.customer?.phone || "No phone"}
+                    </p>
 
-                  <p className="text-sm text-gray-500">
-                    Estimated: {order.estimatedTime}
-                  </p>
+                    {order.orderType === "delivery" && (
+                      <p>{order.customer?.address}</p>
+                    )}
+
+                    <p className="capitalize">Type: {order.orderType}</p>
+                    <p className="capitalize">Payment: {order.paymentStatus}</p>
+                    <p>Estimated: {order.estimatedTime}</p>
+                  </div>
                 </div>
 
                 <select
@@ -144,7 +126,7 @@ function AdminOrders() {
               </div>
 
               <div className="mt-5 space-y-3">
-                {order.items.map((item, index) => (
+                {order.items?.map((item, index) => (
                   <div
                     key={index}
                     className="flex justify-between rounded-2xl bg-gray-50 p-4"
@@ -165,7 +147,7 @@ function AdminOrders() {
 
               <div className="mt-5 flex justify-between border-t pt-5 text-xl font-extrabold">
                 <span>Total</span>
-                <span>${order.totalAmount.toFixed(2)}</span>
+                <span>${Number(order.totalAmount).toFixed(2)}</span>
               </div>
             </div>
           ))
