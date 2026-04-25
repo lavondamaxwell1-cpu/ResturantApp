@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
+import API_URL from "../api";
 function Register() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -21,7 +22,7 @@ function Register() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("${API_URL}/api/auth/register", form);
+      const res = await axios.post(`${API_URL}/api/auth/register`, form);
       login(res.data.user, res.data.token);
       toast.success("Account created successfully");
       navigate("/");
