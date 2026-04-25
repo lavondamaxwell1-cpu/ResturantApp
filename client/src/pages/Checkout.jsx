@@ -24,16 +24,15 @@ function Checkout() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-  };
-  if (isSubmitting) return;
-  setIsSubmitting(true);
-  const handleSubmit = async (e) => {
+  };const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!token) {
       toast.error("Please login before checkout");
       return;
     }
+
+    setIsSubmitting(true); // ✅ move it HERE
 
     try {
       const res = await axios.post(
