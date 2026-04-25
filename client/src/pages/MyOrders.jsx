@@ -16,7 +16,7 @@ function MyOrders() {
          },
        });
 
-       setOrders(res.data);
+     setOrders(Array.isArray(res.data) ? res.data : []);
      } catch (err) {
        console.error("My orders error:", err);
      }

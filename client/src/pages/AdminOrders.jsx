@@ -17,7 +17,7 @@ function AdminOrders() {
           },
         });
 
-        setOrders(res.data);
+      setOrders(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Fetch orders error:", err);
         toast.error("Failed to load orders");

@@ -11,7 +11,7 @@ function OrderSuccess() {
     const fetchOrder = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/orders/${id}`);
-        setOrder(res.data);
+     setOrder(Array.isArray(res.data) ? res.data : []);
 
         if (res.data.paymentStatus === "paid") {
           clearCart();

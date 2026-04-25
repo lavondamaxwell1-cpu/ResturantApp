@@ -13,7 +13,7 @@ function AdminMenu() {
     const fetchMenu = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/menu`);
-        setMenuItems(res.data);
+        setMenuItems(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Fetch menu error:", err);
         toast.error("Failed to load menu items");
