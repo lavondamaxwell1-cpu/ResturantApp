@@ -11,7 +11,7 @@ function OrderSuccess() {
     const fetchOrder = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/orders/${id}`);
-     setOrder(Array.isArray(res.data) ? res.data : []);
+   setOrder(res.data);
 
         if (res.data.paymentStatus === "paid") {
           clearCart();
@@ -79,7 +79,7 @@ function OrderSuccess() {
           </p>
           <p className="mt-1 font-bold">{order.estimatedTime}</p>
           <div className="mt-4 space-y-3">
-            {order.items.map((item, index) => (
+            {order.items?.map((item, index) => (
               <div
                 key={index}
                 className="flex justify-between rounded-2xl bg-gray-50 p-4"
