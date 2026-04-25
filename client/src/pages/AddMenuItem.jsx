@@ -2,9 +2,11 @@ import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import API_URL from "../api";
+import { useAuth } from "../context/useAuth";
 function AddMenuItem() {
   const navigate = useNavigate();
-
+  const { token } = useAuth();
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -32,11 +34,18 @@ function AddMenuItem() {
     try {
       setIsSubmitting(true);
 
-      await axios.post("http://localhost:5000/api/menu", {
-        ...form,
-        price: Number(form.price),
-      });
-
+      await axios.post(
+        `${API_URL}/api/menu`,
+        {
+          ...form,
+          price: Number(form.price),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       toast.success("Item added");
       navigate("/admin");
     } catch (err) {

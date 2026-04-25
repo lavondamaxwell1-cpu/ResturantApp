@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { useCart } from "../context/useCart";
-
+import API_URL from "../api";
 function MenuDetails() {
   const { id } = useParams();
   const { addToCart } = useCart();
@@ -11,7 +11,7 @@ function MenuDetails() {
 
   useEffect(() => {
     const fetchItem = async () => {
-      const res = await axios.get(`http://localhost:5000/api/menu/${id}`);
+      const res = await axios.get(`${API_URL}/api/menu/${id}`);
       setItem(res.data);
     };
 

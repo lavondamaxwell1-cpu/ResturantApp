@@ -7,7 +7,7 @@
       "v": "17",
       "name": "Health Check",
       "method": "GET",
-      "endpoint": "http://localhost:5000/api/health",
+      "endpoint": "${API_URL}/api/health",
       "params": [],
       "headers": [],
       "preRequestScript": "",
@@ -28,7 +28,7 @@
             "v": "6",
             "name": "Health Check",
             "method": "GET",
-            "endpoint": "http://localhost:5000/api/health",
+            "endpoint": "${API_URL}/api/health",
             "headers": [],
             "params": [],
             "body": {

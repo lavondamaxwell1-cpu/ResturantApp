@@ -3,11 +3,12 @@ import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
+import API_URL from "../api";
 function EditMenuItem() {
   const { id } = useParams();
   const { token } = useAuth();
   const navigate = useNavigate();
-const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -19,7 +20,7 @@ const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchItem = async () => {
-      const res = await axios.get(`http://localhost:5000/api/menu/${id}`);
+      const res = await axios.get(`${API_URL}/api/menu/${id}`);
       const item = res.data;
 
       setForm({
@@ -44,36 +45,36 @@ const [isSubmitting, setIsSubmitting] = useState(false);
     });
   };
 
- const handleSubmit = async (e) => {
-   e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-   if (isSubmitting) return;
+    if (isSubmitting) return;
 
-   try {
-     setIsSubmitting(true);
+    try {
+      setIsSubmitting(true);
 
-     await axios.put(
-       `http://localhost:5000/api/menu/${id}`,
-       {
-         ...form,
-         price: Number(form.price),
-       },
-       {
-         headers: {
-           Authorization: `Bearer ${token}`,
-         },
-       }
-     );
+      await axios.put(
+        `${API_URL}/api/menu/${id}`,
+        {
+          ...form,
+          price: Number(form.price),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-     toast.success("Item updated");
-     navigate("/admin");
-   } catch (err) {
-     console.error("Update error:", err);
-     toast.error("Failed to update item");
-   } finally {
-     setIsSubmitting(false);
-   }
- };
+      toast.success("Item updated");
+      navigate("/admin");
+    } catch (err) {
+      console.error("Update error:", err);
+      toast.error("Failed to update item");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <Link to="/admin" className="font-semibold text-gray-600 hover:underline">

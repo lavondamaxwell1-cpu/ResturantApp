@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
-
+import API_URL from "../api";
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const { token } = useAuth();
@@ -11,7 +11,7 @@ function AdminOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/orders", {
+        const res = await axios.get("${API_URL}/api/orders", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -28,64 +28,64 @@ function AdminOrders() {
 
     fetchOrders();
   }, [token]);
- const handleStatusChange = async (orderId, newStatus) => {
-   try {
-     const res = await axios.put(
-       `http://localhost:5000/api/orders/${orderId}/status`,
-       { status: newStatus },
-       {
-         headers: {
-           Authorization: `Bearer ${token}`,
-         },
-       },
-     );
-
-     setOrders((prev) =>
-       prev.map((order) => (order._id === orderId ? res.data : order)),
-     );
-
-     toast.success("Order status updated");
-   } catch (err) {
-     console.error("Update status error:", err);
-     toast.error("Failed to update order status");
-   }
- };
- useEffect(() => {
-  const fetchOrders = async () => {
+  const handleStatusChange = async (orderId, newStatus) => {
     try {
-      const res = await axios.get("http://localhost:5000/api/orders", {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await axios.put(
+        `${API_URL}/api/orders/${orderId}/status`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
-      setOrders(res.data);
+      setOrders((prev) =>
+        prev.map((order) => (order._id === orderId ? res.data : order)),
+      );
+
+      toast.success("Order status updated");
     } catch (err) {
-      console.error("Fetch orders error:", err);
-      toast.error("Failed to load orders");
-    } finally {
-      setLoading(false);
+      console.error("Update status error:", err);
+      toast.error("Failed to update order status");
     }
   };
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get("${API_URL}/api/orders", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  fetchOrders();
-}, [token]);
-if (loading) {
-  return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="h-10 w-48 animate-pulse rounded bg-gray-100" />
+        setOrders(res.data);
+      } catch (err) {
+        console.error("Fetch orders error:", err);
+        toast.error("Failed to load orders");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      <div className="mt-8 space-y-5">
-        {[1, 2, 3].map((item) => (
-          <div
-            key={item}
-            className="h-48 animate-pulse rounded-3xl bg-gray-100"
-          />
-        ))}
-      </div>
-    </main>
-  );
-}
+    fetchOrders();
+  }, [token]);
+  if (loading) {
+    return (
+      <main className="mx-auto max-w-6xl px-4 py-8">
+        <div className="h-10 w-48 animate-pulse rounded bg-gray-100" />
+
+        <div className="mt-8 space-y-5">
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              className="h-48 animate-pulse rounded-3xl bg-gray-100"
+            />
+          ))}
+        </div>
+      </main>
+    );
+  }
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <Link to="/admin" className="font-semibold text-gray-600 hover:underline">

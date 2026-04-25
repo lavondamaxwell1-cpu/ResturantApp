@@ -10,14 +10,11 @@ function MyOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/orders/my-orders",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const res = await axios.get("${API_URL}/api/orders/my-orders", {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         setOrders(res.data);
       } catch (err) {

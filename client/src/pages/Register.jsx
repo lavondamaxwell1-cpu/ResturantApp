@@ -21,15 +21,12 @@ function Register() {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        form,
-      );
+      const res = await axios.post("${API_URL}/api/auth/register", form);
       login(res.data.user, res.data.token);
       toast.success("Account created successfully");
       navigate("/");
     } catch (err) {
-     toast.error(err.response?.data?.message || "Registration failed");
+      toast.error(err.response?.data?.message || "Registration failed");
     }
   };
 

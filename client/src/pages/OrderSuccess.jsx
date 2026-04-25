@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { useCart } from "../context/useCart";
+import API_URL from "../api";
 function OrderSuccess() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
-const { clearCart } = useCart();
+  const { clearCart } = useCart();
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/orders/${id}`);
+        const res = await axios.get(`${API_URL}/api/orders/${id}`);
         setOrder(res.data);
 
         if (res.data.paymentStatus === "paid") {

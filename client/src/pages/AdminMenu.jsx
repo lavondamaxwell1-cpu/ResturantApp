@@ -3,65 +3,66 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
+import API_URL from "../api";
 function AdminMenu() {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const { token } = useAuth();
-useEffect(() => {
-  const fetchMenu = async () => {
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const res = await axios.get("${API_URL}/api/menu");
+        setMenuItems(res.data);
+      } catch (err) {
+        console.error("Fetch menu error:", err);
+        toast.error("Failed to load menu items");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMenu();
+  }, []);
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Delete this item?");
+    if (!confirmDelete) return;
+
     try {
-      const res = await axios.get("http://localhost:5000/api/menu");
-      setMenuItems(res.data);
+      setDeletingId(id);
+
+      await axios.delete(`${API_URL}/api/menu/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setMenuItems((prev) => prev.filter((item) => item._id !== id));
+      toast.success("Menu item deleted");
     } catch (err) {
-      console.error("Fetch menu error:", err);
-      toast.error("Failed to load menu items");
+      console.error("Delete error:", err);
+      toast.error("Failed to delete item");
     } finally {
-      setLoading(false);
+      setDeletingId(null);
     }
   };
+  if (loading) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-8">
+        <div className="h-10 w-56 animate-pulse rounded bg-gray-100" />
 
-  fetchMenu();
-}, []);
-
-const handleDelete = async (id) => {
-  const confirmDelete = window.confirm("Delete this item?");
-  if (!confirmDelete) return;
-
-  try {
-    setDeletingId(id);
-
-    await axios.delete(`http://localhost:5000/api/menu/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    setMenuItems((prev) => prev.filter((item) => item._id !== id));
-    toast.success("Menu item deleted");
-  } catch (err) {
-    console.error("Delete error:", err);
-    toast.error("Failed to delete item");
-  } finally {
-    setDeletingId(null);
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+            <div
+              key={item}
+              className="h-80 animate-pulse rounded-3xl bg-gray-100"
+            />
+          ))}
+        </div>
+      </main>
+    );
   }
-};
-if (loading) {
-  return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
-      <div className="h-10 w-56 animate-pulse rounded bg-gray-100" />
-
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-          <div
-            key={item}
-            className="h-80 animate-pulse rounded-3xl bg-gray-100"
-          />
-        ))}
-      </div>
-    </main>
-  );
-}
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

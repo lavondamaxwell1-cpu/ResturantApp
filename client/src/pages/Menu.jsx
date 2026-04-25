@@ -12,7 +12,7 @@ function Menu() {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/menu");
+        const res = await axios.get("${API_URL}/api/menu");
         setMenuItems(res.data);
       } catch (err) {
         console.error("Fetch menu error:", err);
@@ -23,7 +23,7 @@ function Menu() {
     };
 
     fetchMenu();
-  }, [])
+  }, []);
   if (loading) {
     return (
       <main className="mx-auto max-w-7xl px-4 py-8">

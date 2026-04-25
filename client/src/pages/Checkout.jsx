@@ -25,8 +25,8 @@ function Checkout() {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
-if (isSubmitting) return;
-setIsSubmitting(true);
+  if (isSubmitting) return;
+  setIsSubmitting(true);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -37,7 +37,7 @@ setIsSubmitting(true);
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/payments/create-checkout-session",
+        "${API_URL}/api/payments/create-checkout-session",
         {
           cart,
           customer: form,
