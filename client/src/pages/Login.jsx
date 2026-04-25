@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
+import API_URL from "../api";
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -17,7 +18,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("${API_URL}/api/auth/login", form);
+     const res = await axios.post(`${API_URL}/api/auth/login`, form);
       login(res.data.user, res.data.token);
 
       navigate(res.data.user.role === "admin" ? "/admin" : "/");

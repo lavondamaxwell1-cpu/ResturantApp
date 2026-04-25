@@ -2,28 +2,28 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
-
+import API_URL from "../api";
 function MyOrders() {
   const { token } = useAuth();
   const [orders, setOrders] = useState([]);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await axios.get("${API_URL}/api/orders/my-orders", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+ useEffect(() => {
+   const fetchOrders = async () => {
+     try {
+       const res = await axios.get(`${API_URL}/api/orders/my-orders`, {
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
+       });
 
-        setOrders(res.data);
-      } catch (err) {
-        console.error("My orders error:", err);
-      }
-    };
+       setOrders(res.data);
+     } catch (err) {
+       console.error("My orders error:", err);
+     }
+   };
 
-    if (token) fetchOrders();
-  }, [token]);
+   if (token) fetchOrders();
+ }, [token]);
 
   if (!token) {
     return (

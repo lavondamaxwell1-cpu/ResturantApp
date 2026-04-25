@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useCart } from "../context/useCart";
 import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
-
+import API_URL from "../api";
 function Checkout() {
   const { cart } = useCart();
   const { token } = useAuth();
@@ -37,7 +37,7 @@ function Checkout() {
 
     try {
       const res = await axios.post(
-        "${API_URL}/api/payments/create-checkout-session",
+        `${API_URL}/api/payments/create-checkout-session`,
         {
           cart,
           customer: form,

@@ -12,7 +12,7 @@ function AdminMenu() {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const res = await axios.get("${API_URL}/api/menu");
+        const res = await axios.get(`${API_URL}/api/menu`);
         setMenuItems(res.data);
       } catch (err) {
         console.error("Fetch menu error:", err);

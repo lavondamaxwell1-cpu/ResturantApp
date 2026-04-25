@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useCart } from "../context/useCart";
 import { toast } from "react-toastify";
-
+import API_URL from "../api";
 function Menu() {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +12,7 @@ function Menu() {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const res = await axios.get("${API_URL}/api/menu");
+        const res = await axios.get(`${API_URL}/api/menu`);
         setMenuItems(res.data);
       } catch (err) {
         console.error("Fetch menu error:", err);
