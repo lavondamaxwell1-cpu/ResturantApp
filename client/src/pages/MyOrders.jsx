@@ -3,27 +3,28 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import API_URL from "../api";
+
 function MyOrders() {
   const { token } = useAuth();
   const [orders, setOrders] = useState([]);
 
- useEffect(() => {
-   const fetchOrders = async () => {
-     try {
-       const res = await axios.get(`${API_URL}/api/orders/my-orders`, {
-         headers: {
-           Authorization: `Bearer ${token}`,
-         },
-       });
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/orders/my-orders`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-     setOrders(Array.isArray(res.data) ? res.data : []);
-     } catch (err) {
-       console.error("My orders error:", err);
-     }
-   };
+        setOrders(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.error("My orders error:", err);
+      }
+    };
 
-   if (token) fetchOrders();
- }, [token]);
+    if (token) fetchOrders();
+  }, [token]);
 
   if (!token) {
     return (
@@ -64,33 +65,40 @@ function MyOrders() {
               key={order._id}
               className="rounded-2xl border bg-white p-6 shadow-sm"
             >
+              {/* Header */}
               <div className="flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-lg font-bold">Order #{order._id}</h2>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Status:{" "}
-                    <span className="font-semibold text-orange-600 capitalize">
-                      {order.status}
-                    </span>
-                    <p className="mt-1 text-sm text-gray-500">
+
+                  <div className="mt-1 text-sm text-gray-500 space-y-1">
+                    <p>
+                      Status:{" "}
+                      <span className="font-semibold text-orange-600 capitalize">
+                        {order.status}
+                      </span>
+                    </p>
+
+                    <p>
                       Type:{" "}
                       <span className="font-semibold capitalize text-green-600">
                         {order.orderType}
                       </span>
                     </p>
-                    <p className="mt-1 text-sm text-gray-500">
+
+                    <p>
                       Payment:{" "}
                       <span className="font-semibold capitalize text-green-600">
                         {order.paymentStatus}
                       </span>
                     </p>
-                    <p className="mt-1 text-sm text-gray-500">
+
+                    <p>
                       Time:{" "}
                       <span className="font-semibold">
                         {order.estimatedTime}
                       </span>
                     </p>
-                  </p>
+                  </div>
                 </div>
 
                 <p className="text-xl font-bold text-orange-600">
@@ -98,8 +106,9 @@ function MyOrders() {
                 </p>
               </div>
 
+              {/* Items */}
               <div className="mt-4 space-y-3">
-                {order.items.map((item, index) => (
+                {order.items?.map((item, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between rounded-xl bg-gray-50 p-3"
