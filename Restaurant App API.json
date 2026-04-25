@@ -1,0 +1,69 @@
+{
+  "v": 11,
+  "name": "Restaurant App API",
+  "folders": [],
+  "requests": [
+    {
+      "v": "17",
+      "name": "Health Check",
+      "method": "GET",
+      "endpoint": "http://localhost:5000/api/health",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {
+        "Health Check": {
+          "name": "Health Check",
+          "originalRequest": {
+            "v": "6",
+            "name": "Health Check",
+            "method": "GET",
+            "endpoint": "http://localhost:5000/api/health",
+            "headers": [],
+            "params": [],
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "auth": {
+              "authType": "none",
+              "authActive": true
+            },
+            "requestVariables": []
+          },
+          "status": "OK",
+          "code": 200,
+          "headers": [
+            {
+              "key": "content-length",
+              "value": "28"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
+          "body": "{\"message\":\"API is running\"}"
+        }
+      },
+      "description": null
+    }
+  ],
+  "auth": {
+    "authType": "none",
+    "authActive": true
+  },
+  "headers": [],
+  "variables": [],
+  "description": ""
+}

@@ -1,0 +1,258 @@
+{
+  "v": 11,
+  "name": "Restaurant App API",
+  "folders": [],
+  "requests": [
+    {
+      "v": "17",
+      "name": "Health Check",
+      "method": "GET",
+      "endpoint": "http://localhost:5000/api/health",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {
+        "Health Check": {
+          "name": "Health Check",
+          "originalRequest": {
+            "v": "6",
+            "name": "Health Check",
+            "method": "GET",
+            "endpoint": "http://localhost:5000/api/health",
+            "headers": [],
+            "params": [],
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "auth": {
+              "authType": "none",
+              "authActive": true
+            },
+            "requestVariables": []
+          },
+          "status": "OK",
+          "code": 200,
+          "headers": [
+            {
+              "key": "content-length",
+              "value": "28"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
+          "body": "{\"message\":\"API is running\"}"
+        }
+      },
+      "description": null
+    },
+    {
+      "v": "17",
+      "name": "Register Check",
+      "method": "POST",
+      "endpoint": "http://localhost:5000/api/auth/register",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": "application/json",
+        "body": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"123456\"\n}"
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": null
+    },
+    {
+      "v": "17",
+      "name": "Login User",
+      "method": "POST",
+      "endpoint": "http://localhost:5000/api/auth/login",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": "application/json",
+        "body": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"123456\"\n}"
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": null
+    },
+    {
+      "v": "17",
+      "name": "Get All Menu Items",
+      "method": "GET",
+      "endpoint": "http://localhost:5000/api/menu",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": null
+    },
+    {
+      "v": "17",
+      "name": "Get Single Menu Item",
+      "method": "GET",
+      "endpoint": "http://localhost:5000/api/menu/1",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": null
+    },
+    {
+      "v": "17",
+      "name": "Post Menu Item",
+      "method": "POST",
+      "endpoint": "http://localhost:5000/api/menu",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": "application/json",
+        "body": "{\n  \"name\": \"Cheeseburger\",\n  \"description\": \"Juicy grilled burger\",\n  \"price\": 10.99,\n  \"category\": \"Burgers\",\n  \"image\": \"https://via.placeholder.com/150\"\n}"
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": null
+    },
+    {
+      "v": "17",
+      "name": "menu Items",
+      "method": "POST",
+      "endpoint": "http://localhost:5000/api/menu",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": "application/json",
+        "body": "{\n  \"name\": \"Crispy Chicken Sandwich\",\n  \"description\": \"Crispy chicken breast with lettuce, pickles, and house sauce.\",\n  \"price\": 11.99,\n  \"category\": \"Sandwiches\",\n  \"image\": \"https://via.placeholder.com/150\"\n}"
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": null
+    },
+    {
+      "v": "17",
+      "name": "update menu item",
+      "method": "PUT",
+      "endpoint": "http://localhost:5000/api/menu/69ea9fa1990ceb21d298cb3c",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": null
+    },
+    {
+      "v": "17",
+      "name": "Post Order",
+      "method": "POST",
+      "endpoint": "http://localhost:5000/api/orders",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": "application/json",
+        "body": "{\n  \"items\": [\n    {\n      \"menuItemId\": \"123\",\n      \"name\": \"Cheeseburger\",\n      \"price\": 10.99,\n      \"quantity\": 2,\n      \"image\": \"https://via.placeholder.com/150\"\n    }\n  ],\n  \"totalAmount\": 21.98,\n  \"customer\": {\n    \"name\": \"Test Customer\",\n    \"address\": \"123 Main Street\",\n    \"phone\": \"555-1234\"\n  }\n}"
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": null
+    },
+    {
+      "v": "17",
+      "name": "Get order",
+      "method": "GET",
+      "endpoint": "http://localhost:5000/api/orders",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": null
+    }
+  ],
+  "auth": {
+    "authActive": true,
+    "authType": "none"
+  },
+  "headers": [],
+  "variables": [],
+  "description": ""
+}
