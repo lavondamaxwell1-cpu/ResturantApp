@@ -42,6 +42,7 @@ const orderSchema = new mongoose.Schema(
         default: "",
       },
       phone: String,
+      email: String,
     },
 
     status: {

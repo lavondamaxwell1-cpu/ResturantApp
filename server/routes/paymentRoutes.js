@@ -1,75 +1,65 @@
 const express = require("express");
 const router = express.Router();
 const Stripe = require("stripe");
-
-const Order = require("../models/Order");
-const protect = require("../middleware/authMiddleware");
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Create Stripe checkout session
-router.post("/create-checkout-session", protect, async (req, res) => {
+const Order = require("../models/Order");
+const sendEmail = require("../utils/sendEmail");
+
+//
+// 🔹 CREATE CHECKOUT SESSION
+//
+router.post("/create-checkout-session", async (req, res) => {
   try {
     const { cart, customer, orderType, estimatedTime } = req.body;
 
-    if (!cart || cart.length === 0) {
-      return res.status(400).json({ message: "Cart is empty" });
-    }
-
-    const totalAmount = cart.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0,
-    );
-
-    const order = await Order.create({
-      user: req.user.id,
-      items: cart.map((item) => ({
-        menuItemId: item._id,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        image: item.image,
-      })),
-      totalAmount,
+    // Create order in DB (pending)
+    const newOrder = new Order({
+      items: cart,
       customer,
       orderType,
       estimatedTime,
+      totalAmount: cart.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0,
+      ),
       paymentStatus: "pending",
+      status: "pending",
     });
 
-    const line_items = cart.map((item) => ({
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: item.name,
-        },
-        unit_amount: Math.round(item.price * 100),
-      },
-      quantity: item.quantity,
-    }));
+    await newOrder.save();
 
+    // Create Stripe session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      line_items,
+      line_items: cart.map((item) => ({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.name,
+          },
+          unit_amount: Math.round(item.price * 100),
+        },
+        quantity: item.quantity,
+      })),
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/order-success/${order._id}`,
+      success_url: `${process.env.CLIENT_URL}/order-success/${newOrder._id}`,
       cancel_url: `${process.env.CLIENT_URL}/cart`,
       metadata: {
-        orderId: order._id.toString(),
+        orderId: newOrder._id.toString(),
       },
     });
-
-    order.stripeSessionId = session.id;
-    await order.save();
 
     res.json({ url: session.url });
   } catch (err) {
     console.error("Stripe error:", err);
-    res.status(500).json({ message: "Stripe error" });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// Stripe webhook
+//
+// 🔹 STRIPE WEBHOOK
+//
 router.post(
   "/webhook",
   express.raw({ type: "application/json" }),
@@ -85,34 +75,54 @@ router.post(
         process.env.STRIPE_WEBHOOK_SECRET,
       );
     } catch (err) {
-      console.error("Webhook signature failed:", err.message);
+      console.error("Webhook signature error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    try {
+    // ✅ PAYMENT SUCCESS
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
 
-      const order = await Order.findById(session.metadata.orderId);
+      try {
+        const order = await Order.findById(session.metadata.orderId);
 
-      if (!order) {
-        return res.status(404).json({ message: "Order not found" });
+        if (!order) {
+          console.log("Order not found");
+          return res.sendStatus(200);
+        }
+
+        // Update order
+        order.paymentStatus = "paid";
+        await order.save();
+
+        // ✅ SEND EMAIL
+        if (order.customer?.email) {
+          await sendEmail({
+            to: order.customer.email,
+            subject: "Your order is confirmed!",
+            html: `
+              <div style="font-family:sans-serif">
+                <h2 style="color:green;">Order Confirmed 🎉</h2>
+                <p>Hi ${order.customer.name},</p>
+                <p>Your order has been received and is being prepared.</p>
+                <hr/>
+                <p><strong>Type:</strong> ${order.orderType}</p>
+                <p><strong>Estimated Time:</strong> ${order.estimatedTime}</p>
+                <p><strong>Total:</strong> $${order.totalAmount.toFixed(2)}</p>
+                <br/>
+                <p>Thanks for ordering 🍔</p>
+              </div>
+            `,
+          });
+        }
+
+        console.log("Order updated + email sent");
+      } catch (err) {
+        console.error("Webhook processing error:", err);
       }
-
-      if (order.paymentStatus === "paid") {
-        return res.json({ received: true });
-      }
-
-      order.paymentStatus = "paid";
-      order.stripeSessionId = session.id;
-      await order.save();
     }
 
-      res.json({ received: true });
-    } catch (err) {
-      console.error("Webhook order update error:", err);
-      res.status(500).json({ message: "Webhook error" });
-    }
+    res.sendStatus(200);
   },
 );
 

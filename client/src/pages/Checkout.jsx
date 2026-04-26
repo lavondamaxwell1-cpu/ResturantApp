@@ -14,6 +14,7 @@ function Checkout() {
     address: "",
     phone: "",
     orderType: "delivery",
+    email: "",
   });
 
   const totalAmount = cart.reduce(
@@ -134,7 +135,15 @@ function Checkout() {
             required
             className="mt-5 w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
           />
-
+          <input
+            name="email"
+            type="email"
+            placeholder="Email address"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="mt-5 w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
+          />
           {/* Address */}
           {form.orderType === "delivery" && (
             <input
