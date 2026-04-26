@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Stripe = require("stripe");
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const Order = require("../models/Order");
@@ -21,7 +22,7 @@ router.post("/create-checkout-session", async (req, res) => {
       estimatedTime,
       totalAmount: cart.reduce(
         (total, item) => total + item.price * item.quantity,
-        0,
+        0
       ),
       paymentStatus: "pending",
       status: "pending",
@@ -58,77 +59,78 @@ router.post("/create-checkout-session", async (req, res) => {
 });
 
 //
-// 🔹 STRIPE WEBHOOK
+// 🔹 STRIPE WEBHOOK (IMPORTANT: NO express.raw here)
 //
-router.post(
-  "/webhook",
-  express.raw({ type: "application/json" }),
-  async (req, res) => {
-    console.log("WEBHOOK HIT");
-    const sig = req.headers["stripe-signature"];
+router.post("/webhook", async (req, res) => {
+  console.log("WEBHOOK HIT");
 
-    let event;
+  const sig = req.headers["stripe-signature"];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+
+    console.log("WEBHOOK RECEIVED:", event.type);
+  } catch (err) {
+    console.error("Webhook signature error:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  //
+  // ✅ PAYMENT SUCCESS
+  //
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
 
     try {
-      event = stripe.webhooks.constructEvent(
-        req.body,
-        sig,
-        process.env.STRIPE_WEBHOOK_SECRET,
-      );
-      console.log("WEBHOOK RECEIVED:", event.type);
-    } catch (err) {
-      console.error("Webhook signature error:", err.message);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
+      const order = await Order.findById(session.metadata.orderId);
 
-    // ✅ PAYMENT SUCCESS
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object;
-      console.log("WEBHOOK EVENT:", event.type);
-      try {
-        const order = await Order.findById(session.metadata.orderId);
-        console.log("ORDER FOUND:", order?._id);
-        console.log("EMAIL TO:", order?.customer?.email);
-        if (!order) {
-          console.log("Order not found");
-          return res.sendStatus(200);
-        }
+      console.log("ORDER FOUND:", order?._id);
+      console.log("EMAIL TO:", order?.customer?.email);
 
-        // Update order
-        order.paymentStatus = "paid";
-        await order.save();
-
-        // ✅ SEND EMAIL
-        if (order.customer?.email) {
-          await sendEmail({
-            to: order.customer.email,
-            subject: "Your order is confirmed!",
-            html: `
-              <div style="font-family:sans-serif">
-                <h2 style="color:green;">Order Confirmed 🎉</h2>
-                <p>Hi ${order.customer.name},</p>
-                <p>Your order has been received and is being prepared.</p>
-                <hr/>
-                <p><strong>Type:</strong> ${order.orderType}</p>
-                <p><strong>Estimated Time:</strong> ${order.estimatedTime}</p>
-                <p><strong>Total:</strong> $${order.totalAmount.toFixed(2)}</p>
-                <br/>
-                <p>Thanks for ordering 🍔</p>
-              </div>
-            `,
-          });
-          console.log("ORDER ID:", session.metadata.orderId);
-          console.log("EMAIL TO:", order.customer?.email);
-        }
-
-        console.log("Order updated + email sent");
-      } catch (err) {
-        console.error("Webhook processing error:", err);
+      if (!order) {
+        console.log("Order not found:", session.metadata.orderId);
+        return res.sendStatus(200);
       }
-    }
 
-    res.sendStatus(200);
-  },
-);
+      // ✅ Update order
+      order.paymentStatus = "paid";
+      order.stripeSessionId = session.id;
+      await order.save();
+
+      // ✅ Send email
+      if (order.customer?.email) {
+        await sendEmail({
+          to: order.customer.email,
+          subject: "Your order is confirmed!",
+          html: `
+            <div style="font-family:sans-serif">
+              <h2 style="color:green;">Order Confirmed 🎉</h2>
+              <p>Hi ${order.customer.name},</p>
+              <p>Your order has been received and is being prepared.</p>
+              <hr/>
+              <p><strong>Type:</strong> ${order.orderType}</p>
+              <p><strong>Estimated Time:</strong> ${order.estimatedTime}</p>
+              <p><strong>Total:</strong> $${order.totalAmount.toFixed(2)}</p>
+              <br/>
+              <p>Thanks for ordering 🍔</p>
+            </div>
+          `,
+        });
+      }
+
+      console.log("Order updated + email sent");
+    } catch (err) {
+      console.error("Webhook processing error:", err);
+    }
+  }
+
+  res.sendStatus(200);
+});
 
 module.exports = router;
