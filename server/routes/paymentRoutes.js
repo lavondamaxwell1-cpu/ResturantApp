@@ -74,6 +74,7 @@ router.post(
         sig,
         process.env.STRIPE_WEBHOOK_SECRET,
       );
+      console.log("WEBHOOK RECEIVED:", event.type);
     } catch (err) {
       console.error("Webhook signature error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -82,10 +83,11 @@ router.post(
     // ✅ PAYMENT SUCCESS
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
-console.log("WEBHOOK EVENT:", event.type);
+      console.log("WEBHOOK EVENT:", event.type);
       try {
         const order = await Order.findById(session.metadata.orderId);
-
+        console.log("ORDER FOUND:", order?._id);
+        console.log("EMAIL TO:", order?.customer?.email);
         if (!order) {
           console.log("Order not found");
           return res.sendStatus(200);
