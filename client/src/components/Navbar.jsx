@@ -20,7 +20,7 @@ function Navbar() {
     <nav className="sticky top-0 z-50 border-b bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
         <Link to="/" onClick={closeMenu} className="text-2xl font-extrabold">
-          Eats<span className="text-green-600">Hub</span>
+          Mimi<span className="text-green-600">Cafe</span>
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">
