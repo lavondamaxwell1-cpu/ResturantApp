@@ -6,15 +6,16 @@ import { useAuth } from "../context/useAuth";
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { totalCartItems } = useCart();
+const { totalCartItems, clearCart } = useCart();
   const { user, logout } = useAuth();
 
   const closeMenu = () => setIsOpen(false);
 
-  const handleLogout = () => {
-    logout();
-    closeMenu();
-  };
+const handleLogout = () => {
+  logout();
+  clearCart();
+  closeMenu();
+};
 
   return (
     <nav className="sticky top-0 z-50 border-b bg-white">
