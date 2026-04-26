@@ -1,30 +1,74 @@
-# 🍔 Mimi cafe– Full Stack Food Ordering App
+# 🍔 Restaurant Ordering App
 
-A modern, full-stack food ordering web application inspired by Uber Eats. Users can browse a dynamic menu, place orders with Stripe, and track their order status. Admins can manage menu items and orders through a dedicated dashboard.
-
----
-
-## 🚀 Live Demo
-
-👉 *(Add after deployment)*
-https://your-app-url.com
+A full-stack restaurant ordering platform where users can browse a menu, add items to cart, checkout with Stripe, and track their orders — with an admin dashboard to manage everything.
 
 ---
 
-## 🛠️ Tech Stack
+## 🌍 Live Demo
+
+👉 https://resturant-app-dun.vercel.app
+
+---
+
+## 🚀 Features
+
+### 👤 User Side
+
+* Browse restaurant menu
+* Add/remove items from cart
+* Secure checkout with Stripe
+* Order confirmation page
+* View past orders
+
+### 🛠 Admin Side
+
+* Manage menu items (add/edit/delete)
+* View all orders
+* Update order status (pending → preparing → ready → completed)
+
+---
+
+## 📸 Screenshots
+
+### 🏠 Home Page
+
+![Home](./screenshots/home.png)
+
+### 🛒 Cart
+
+![Cart](./screenshots/cart.png)
+
+### 💳 Checkout
+
+![Checkout](./screenshots/checkout.png)
+
+### 💳 Stripe Payment
+
+![Payment](./screenshots/payment.png)
+
+### ✅ Order Success
+
+![Success](./screenshots/success.png)
+
+### 🛠 Admin Dashboard
+
+![Admin](./screenshots/admin.png)
+
+---
+
+## 🧱 Tech Stack
 
 ### Frontend
 
 * React (Vite)
-* Tailwind CSS
 * React Router
 * Axios
-* React Toastify
+* Tailwind CSS
 
 ### Backend
 
 * Node.js
-* Express.js
+* Express
 * MongoDB (Mongoose)
 
 ### Payments
@@ -32,99 +76,30 @@ https://your-app-url.com
 * Stripe Checkout
 * Stripe Webhooks
 
----
+### Deployment
 
-## ✨ Features
-
-### 👤 User
-
-* Browse menu items with images
-* Add/remove items from cart
-* Checkout securely with Stripe
-* Choose delivery or pickup
-* View order history
-* See payment status and estimated time
-
-### 🛠️ Admin
-
-* Add, edit, delete menu items
-* Toggle item availability
-* View all orders
-* Update order status
-
-### 💳 Payments
-
-* Stripe Checkout integration
-* Webhook-based order confirmation
-* Duplicate order prevention
+* Frontend: Vercel
+* Backend: Render
 
 ---
 
-## ⚙️ Installation
+## ⚙️ Environment Variables
 
-### 1. Clone the repository
+### Backend (.env)
 
-```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
 ```
-
----
-
-### 2. Install dependencies
-
-#### Backend
-
-```bash
-cd server
-npm install
-```
-
-#### Frontend
-
-```bash
-cd client
-npm install
-```
-
----
-
-### 3. Environment Variables
-
-Create a `.env` file in the `server` folder:
-
-```env
+PORT=5000
 MONGO_URI=your_mongodb_connection
-JWT_SECRET=your_secret
+JWT_SECRET=your_jwt_secret
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=https://your-vercel-app.vercel.app
 ```
 
----
+### Frontend (Vercel)
 
-### 4. Run the app
-
-#### Backend
-
-```bash
-cd server
-npm run dev
 ```
-
-#### Frontend
-
-```bash
-cd client
-npm run dev
-```
-
----
-
-### 5. Stripe Webhook (required for payments)
-
-```bash
-stripe listen --forward-to localhost:5000/api/payments/webhook
+VITE_API_URL=https://your-render-backend.onrender.com
 ```
 
 ---
@@ -135,51 +110,57 @@ Use Stripe test card:
 
 ```
 4242 4242 4242 4242
-```
-
-Any future date and any CVC.
-
----
-
-## 📁 Project Structure
-
-```
-client/        # React frontend
-server/        # Express backend
-models/        # Database models
-routes/        # API routes
-middleware/    # Auth & admin protection
+Expiry: 12/34
+CVC: 123
+ZIP: 12345
 ```
 
 ---
 
-## 🧠 Key Concepts
+## 📦 Installation (Local Setup)
 
-* JWT authentication & role-based access
-* Protected routes (frontend + backend)
-* Stripe payments with webhooks
-* Idempotent order handling (no duplicates)
-* Responsive UI (mobile + desktop)
-* Global state (cart & auth)
+### 1. Clone repo
+
+```
+git clone https://github.com/your-username/ResturantApp.git
+cd ResturantApp
+```
+
+### 2. Backend
+
+```
+cd server
+npm install
+npm run dev
+```
+
+### 3. Frontend
+
+```
+cd client
+npm install
+npm run dev
+```
 
 ---
 
 ## 📌 Future Improvements
 
+* Email order confirmations
 * Real-time order tracking
-* Email/SMS notifications
-* Image uploads (Cloudinary)
-* Ratings & reviews
-* Promo codes / discounts
+* Admin analytics dashboard
+* Image uploads via Cloudinary
+* Mobile UI improvements
 
 ---
 
-## 👨‍💻 Author
+## 🙌 Acknowledgements
 
-Lavonda Maxwell
+* Stripe for payment processing
+* MongoDB Atlas for database hosting
 
 ---
 
-## ⭐️ Support
+## 📄 License
 
-If you like this project, give it a ⭐️ on GitHub!
+This project is open-source and available under the MIT License.
