@@ -31,29 +31,22 @@ A full-stack restaurant ordering platform where users can browse a menu, add ite
 ## 📸 Screenshots
 
 ### 🏠 Home Page
-
-![Home](./screenshots/home.png)
+![Home](https://raw.githubusercontent.com/lavondamaxwell1-cpu/ResturantApp/main/screenshots/home.png)
 
 ### 🛒 Cart
-
-![Cart](./screenshots/cart.png)
+![Cart](https://raw.githubusercontent.com/lavondamaxwell1-cpu/ResturantApp/main/screenshots/cart.png)
 
 ### 💳 Checkout
-
-![Checkout](./screenshots/checkout.png)
+![Checkout](https://raw.githubusercontent.com/lavondamaxwell1-cpu/ResturantApp/main/screenshots/checkout.png)
 
 ### 💳 Stripe Payment
-
-![Payment](./screenshots/payment.png)
+![Payment](https://raw.githubusercontent.com/lavondamaxwell1-cpu/ResturantApp/main/screenshots/payment.png)
 
 ### ✅ Order Success
-
-![Success](./screenshots/success.png)
+![Success](https://raw.githubusercontent.com/lavondamaxwell1-cpu/ResturantApp/main/screenshots/success.png)
 
 ### 🛠 Admin Dashboard
-
-![Admin](./screenshots/admin.png)
-
+![Admin](https://raw.githubusercontent.com/lavondamaxwell1-cpu/ResturantApp/main/screenshots/admin.png)
 ---
 
 ## 🧱 Tech Stack
