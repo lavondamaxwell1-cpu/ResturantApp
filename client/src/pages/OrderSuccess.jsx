@@ -11,16 +11,12 @@ function OrderSuccess() {
     const fetchOrder = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/orders/${id}`);
-   setOrder(res.data);
-
-        if (res.data.paymentStatus === "paid") {
-          clearCart();
-        }
+        setOrder(res.data);
+        clearCart();
       } catch (err) {
         console.error("Fetch order error:", err);
       }
     };
-
     fetchOrder();
   }, [id, clearCart]);
 
