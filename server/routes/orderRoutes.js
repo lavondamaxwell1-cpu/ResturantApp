@@ -3,6 +3,7 @@ const router = express.Router();
 const Order = require("../models/Order");
 const protect = require("../middleware/authMiddleware");
 const adminOnly = require("../middleware/adminMiddleware");
+const sendEmail = require("../utils/sendEmail");
 // CREATE order
 router.post("/", async (req, res) => {
   try {
@@ -80,6 +81,45 @@ router.put("/:id/status", protect, adminOnly, async (req, res) => {
   } catch (err) {
     console.error("Update order status error:", err);
     res.status(400).json({ message: "Error updating order status" });
+  }
+});
+
+router.put("/:id/status", protect, adminOnly, async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { returnDocument: "after" },
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (status === "ready" && order.customer?.email) {
+      await sendEmail({
+        to: order.customer.email,
+        subject: "Your order is ready!",
+        html: `
+          <div style="font-family:sans-serif">
+            <h2>Your order is ready 🎉</h2>
+            <p>Hi ${order.customer.name},</p>
+            <p>Your order is ready for pickup or delivery.</p>
+            <p><strong>Order ID:</strong> ${order._id}</p>
+            <p><strong>Status:</strong> ${order.status}</p>
+            <br/>
+            <p>Thanks for ordering!</p>
+          </div>
+        `,
+      });
+    }
+
+    res.json(order);
+  } catch (err) {
+    console.error("Update order status error:", err);
+    res.status(500).json({ message: "Error updating order status" });
   }
 });
 
