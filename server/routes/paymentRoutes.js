@@ -82,7 +82,7 @@ router.post(
     // ✅ PAYMENT SUCCESS
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
-
+console.log("WEBHOOK EVENT:", event.type);
       try {
         const order = await Order.findById(session.metadata.orderId);
 
@@ -114,6 +114,8 @@ router.post(
               </div>
             `,
           });
+          console.log("ORDER ID:", session.metadata.orderId);
+          console.log("EMAIL TO:", order.customer?.email);
         }
 
         console.log("Order updated + email sent");

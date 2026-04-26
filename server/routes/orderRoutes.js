@@ -120,7 +120,7 @@ router.put("/:id/status", protect, adminOnly, async (req, res) => {
   } catch (err) {
     console.error("Update order status error:", err);
     res.status(500).json({ message: "Error updating order status" });
-  }
+  }git 
 });
 
 // GET single order
