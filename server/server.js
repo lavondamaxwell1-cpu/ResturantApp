@@ -25,20 +25,27 @@ mongoose
 //
 // 🔹 CORS
 //
+//
+// 🔹 CORS
+//
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  "http://localhost:5173",
+  "http://localhost:3000",
   "https://resturant-app-dun.vercel.app",
   "https://resturant-dxqqgogh0-lavondamaxwell1-cpus-projects.vercel.app",
-];
+  process.env.CLIENT_URL,
+].filter(Boolean);
 
 app.use(
   cors({
     origin: function (origin, callback) {
+      console.log("Incoming origin:", origin);
+
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+        return callback(null, true);
       }
+
+      return callback(new Error(`Not allowed by CORS: ${origin}`));
     },
     credentials: true,
   })
