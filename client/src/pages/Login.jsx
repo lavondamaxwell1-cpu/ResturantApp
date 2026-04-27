@@ -18,9 +18,9 @@ function Login() {
     e.preventDefault();
 
     try {
-     const res = await axios.post(`${API_URL}/api/auth/login`, form);
+      const res = await axios.post(`${API_URL}/api/auth/login`, form);
       login(res.data.user, res.data.token);
-
+      localStorage.setItem("token", res.data.token);
       navigate(res.data.user.role === "admin" ? "/admin" : "/");
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");

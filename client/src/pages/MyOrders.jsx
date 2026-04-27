@@ -1,34 +1,29 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/useAuth";
-import API_URL from "../api";
+import api from "../api";
 
 function MyOrders() {
   const { token } = useAuth();
   const [orders, setOrders] = useState([]);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/orders/my-orders`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setOrders(Array.isArray(res.data) ? res.data : []);
-      } catch (err) {
-        console.error("My orders error:", err.response?.data || err.message);
-        toast.error(err.response?.data?.message || "Failed to load orders");
-      }
-    };
-
-    if (token) {
-      fetchOrders();
+useEffect(() => {
+  const fetchOrders = async () => {
+    try {
+      const res = await api.get("/api/orders/my-orders");
+      setOrders(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("My orders error:", err.response?.data || err.message);
+      toast.error(err.response?.data?.message || "Failed to load orders");
     }
-  }, [token]);
+  };
+
+  if (token) {
+    fetchOrders();
+  }
+}, [token]);
 
   if (!token) {
     return (
