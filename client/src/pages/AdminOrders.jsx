@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/useAuth";
-import API_URL from "../api";
 
+import api from "../api";
 function AdminOrders() {
   const { token } = useAuth();
   const [orders, setOrders] = useState([]);
@@ -13,11 +13,7 @@ function AdminOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/orders`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+     const res = await api.get("/api/orders");
 
         setOrders(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
@@ -33,15 +29,9 @@ function AdminOrders() {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      const res = await axios.put(
-        `${API_URL}/api/orders/${orderId}/status`,
-        { status: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     const res = await api.put(`/api/orders/${orderId}/status`, {
+       status: newStatus,
+     });
 
       setOrders((prev) =>
         prev.map((order) => (order._id === orderId ? res.data : order)),
