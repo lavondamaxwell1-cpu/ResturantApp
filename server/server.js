@@ -22,11 +22,26 @@ mongoose
 //
 // 🔹 CORS
 //
+a//
+// 🔹 CORS
+//
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "https://resturant-app-dun.vercel.app",
+  "https://resturant-dxqqgogh0-lavondamaxwell1-cpus-projects.vercel.app",
+];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
-  }),
+  })
 );
 
 //
