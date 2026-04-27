@@ -22,7 +22,7 @@ mongoose
 //
 // 🔹 CORS
 //
-a//
+//
 // 🔹 CORS
 //
 const allowedOrigins = [
