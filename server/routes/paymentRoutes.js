@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Stripe = require("stripe");
-
+const { protect } = require("../middleware/authMiddleware");
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const Order = require("../models/Order");
@@ -10,23 +10,24 @@ const sendEmail = require("../utils/sendEmail");
 //
 // 🔹 CREATE CHECKOUT SESSION
 //
-router.post("/create-checkout-session", async (req, res) => {
+router.post("/create-checkout-session", protect, async (req, res) => {
   try {
     const { cart, customer, orderType, estimatedTime } = req.body;
 
     // Create order in DB (pending)
-    const newOrder = new Order({
-      items: cart,
-      customer,
-      orderType,
-      estimatedTime,
-      totalAmount: cart.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      ),
-      paymentStatus: "pending",
-      status: "pending",
-    });
+   const newOrder = new Order({
+     user: req.user.id,
+     items: cart,
+     customer,
+     orderType,
+     estimatedTime,
+     totalAmount: cart.reduce(
+       (total, item) => total + item.price * item.quantity,
+       0,
+     ),
+     paymentStatus: "pending",
+     status: "pending",
+   });
 
     await newOrder.save();
 
