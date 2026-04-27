@@ -33,9 +33,9 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://resturant-app-dun.vercel.app",
   "https://resturant-dxqqgogh0-lavondamaxwell1-cpus-projects.vercel.app",
+  "https://resturant-g9mpuitx8-lavondamaxwell1-cpus-projects.vercel.app",
   process.env.CLIENT_URL,
 ].filter(Boolean);
-
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -48,7 +48,7 @@ app.use(
       return callback(new Error(`Not allowed by CORS: ${origin}`));
     },
     credentials: true,
-  })
+  }),
 );
 
 //
