@@ -1,28 +1,32 @@
 import { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
-import API_URL from "../api";
+import api from "../api";
+
 function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
 
-  const [form, setForm] = useState({ email: "", password: "" });
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(`${API_URL}/api/auth/login`, form);
-      login(res.data.user, res.data.token);
+      const res = await api.post("/api/auth/login", {
+        email,
+        password,
+      });
+
+      // ✅ Save token
       localStorage.setItem("token", res.data.token);
-      navigate(res.data.user.role === "admin" ? "/admin" : "/");
+
+      toast.success("Login successful");
+
+      // ✅ Go to orders page
+      navigate("/my-orders");
     } catch (err) {
+      console.error("Login error:", err.response?.data || err.message);
       toast.error(err.response?.data?.message || "Login failed");
     }
   };
@@ -35,21 +39,19 @@ function Login() {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <input
-            name="email"
             type="email"
             placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             className="w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
           />
 
           <input
-            name="password"
             type="password"
             placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
             className="w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
           />
