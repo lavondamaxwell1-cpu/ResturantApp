@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../api";
+import { useAuth } from "../context/useAuth";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,13 +20,15 @@ function Login() {
         password,
       });
 
-      // ✅ Save token
-      localStorage.setItem("token", res.data.token);
+      login(res.data.user, res.data.token);
 
       toast.success("Login successful");
 
-      // ✅ Go to orders page
-      navigate("/my-orders");
+      if (res.data.user?.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/my-orders");
+      }
     } catch (err) {
       console.error("Login error:", err.response?.data || err.message);
       toast.error(err.response?.data?.message || "Login failed");
@@ -79,3 +83,5 @@ function Login() {
 }
 
 export default Login;
+
+ 
