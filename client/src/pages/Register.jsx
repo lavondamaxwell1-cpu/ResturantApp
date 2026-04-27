@@ -1,12 +1,10 @@
 import { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
-import API_URL from "../api";
+import api from "../api";
+
 function Register() {
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [form, setForm] = useState({
     name: "",
@@ -14,20 +12,38 @@ function Register() {
     password: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isSubmitting) return;
+
     try {
-      const res = await axios.post(`${API_URL}/api/auth/register`, form);
-      login(res.data.user, res.data.token);
+      setIsSubmitting(true);
+
+      const res = await api.post("/api/auth/register", form);
+
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
       toast.success("Account created successfully");
-      navigate("/");
+      navigate("/my-orders");
     } catch (err) {
+      console.error("Register error:", err.response?.data || err.message);
       toast.error(err.response?.data?.message || "Registration failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -37,11 +53,15 @@ function Register() {
         <h1 className="text-4xl font-extrabold tracking-tight">
           Create account
         </h1>
-        <p className="mt-2 text-gray-600">Sign up and start ordering.</p>
+
+        <p className="mt-2 text-gray-600">
+          Sign up to start ordering your favorites.
+        </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <input
             name="name"
+            type="text"
             placeholder="Full name"
             value={form.name}
             onChange={handleChange}
@@ -71,9 +91,10 @@ function Register() {
 
           <button
             type="submit"
-            className="w-full rounded-full bg-green-600 px-6 py-4 font-bold text-white hover:bg-green-700"
+            disabled={isSubmitting}
+            className="w-full rounded-full bg-black px-6 py-4 font-bold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
           >
-            Sign up
+            {isSubmitting ? "Creating account..." : "Register"}
           </button>
         </form>
 

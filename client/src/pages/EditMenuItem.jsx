@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
-import API_URL from "../api";
+import api from "../api";
+
 function EditMenuItem() {
   const { id } = useParams();
-  const { token } = useAuth();
   const navigate = useNavigate();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -20,17 +20,22 @@ function EditMenuItem() {
 
   useEffect(() => {
     const fetchItem = async () => {
-      const res = await axios.get(`${API_URL}/api/menu/${id}`);
-      const item = res.data;
+      try {
+        const res = await api.get(`/api/menu/${id}`);
+        const item = res.data;
 
-      setForm({
-        name: item.name || "",
-        description: item.description || "",
-        price: item.price || "",
-        category: item.category || "",
-        image: item.image || "",
-        available: item.available ?? true,
-      });
+        setForm({
+          name: item.name || "",
+          description: item.description || "",
+          price: item.price || "",
+          category: item.category || "",
+          image: item.image || "",
+          available: item.available ?? true,
+        });
+      } catch (err) {
+        console.error("Fetch item error:", err.response?.data || err.message);
+        toast.error("Failed to load item");
+      }
     };
 
     fetchItem();
@@ -39,10 +44,10 @@ function EditMenuItem() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -53,28 +58,21 @@ function EditMenuItem() {
     try {
       setIsSubmitting(true);
 
-      await axios.put(
-        `${API_URL}/api/menu/${id}`,
-        {
-          ...form,
-          price: Number(form.price),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      await api.put(`/api/menu/${id}`, {
+        ...form,
+        price: Number(form.price),
+      });
 
       toast.success("Item updated");
       navigate("/admin");
     } catch (err) {
-      console.error("Update error:", err);
-      toast.error("Failed to update item");
+      console.error("Update error:", err.response?.data || err.message);
+      toast.error(err.response?.data?.message || "Failed to update item");
     } finally {
       setIsSubmitting(false);
     }
   };
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <Link to="/admin" className="font-semibold text-gray-600 hover:underline">
@@ -86,9 +84,6 @@ function EditMenuItem() {
         <h1 className="mt-1 text-4xl font-extrabold tracking-tight">
           Edit menu item
         </h1>
-        <p className="mt-2 text-gray-600">
-          Update item details, pricing, availability, or image path.
-        </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <input
@@ -97,7 +92,7 @@ function EditMenuItem() {
             value={form.name}
             onChange={handleChange}
             required
-            className="w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
+            className="w-full rounded-2xl border bg-gray-50 px-5 py-4"
           />
 
           <textarea
@@ -106,7 +101,7 @@ function EditMenuItem() {
             value={form.description}
             onChange={handleChange}
             rows="4"
-            className="w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
+            className="w-full rounded-2xl border bg-gray-50 px-5 py-4"
           />
 
           <input
@@ -117,7 +112,7 @@ function EditMenuItem() {
             value={form.price}
             onChange={handleChange}
             required
-            className="w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
+            className="w-full rounded-2xl border bg-gray-50 px-5 py-4"
           />
 
           <input
@@ -125,7 +120,7 @@ function EditMenuItem() {
             placeholder="Category"
             value={form.category}
             onChange={handleChange}
-            className="w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
+            className="w-full rounded-2xl border bg-gray-50 px-5 py-4"
           />
 
           <input
@@ -133,7 +128,7 @@ function EditMenuItem() {
             placeholder="/images/burger.jpg"
             value={form.image}
             onChange={handleChange}
-            className="w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
+            className="w-full rounded-2xl border bg-gray-50 px-5 py-4"
           />
 
           {form.image && (
@@ -150,7 +145,6 @@ function EditMenuItem() {
               type="checkbox"
               checked={form.available}
               onChange={handleChange}
-              className="h-5 w-5 accent-green-600"
             />
             Available
           </label>
@@ -158,16 +152,9 @@ function EditMenuItem() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-6 py-4 font-bold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+            className="w-full rounded-full bg-orange-600 px-6 py-4 font-bold text-white"
           >
-            {isSubmitting ? (
-              <>
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-                Updating...
-              </>
-            ) : (
-              "Update item"
-            )}
+            {isSubmitting ? "Updating..." : "Update item"}
           </button>
         </form>
       </div>

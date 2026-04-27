@@ -1,31 +1,26 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { useCart } from "../context/useCart";
-import API_URL from "../api";
+import api from "../api";
 
 function OrderSuccess() {
   const { id } = useParams();
-  const [order, setOrder] = useState(null);
   const { clearCart } = useCart();
+
+  const [order, setOrder] = useState(null);
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/orders/${id}`);
-
+        const res = await api.get(`/api/orders/${id}`);
         setOrder(res.data);
-
-        // ✅ Always clear cart on success page
         clearCart();
       } catch (err) {
         console.error("Fetch order error:", err.response?.data || err.message);
       }
     };
 
-    if (id) {
-      fetchOrder();
-    }
+    if (id) fetchOrder();
   }, [id, clearCart]);
 
   if (!order) {
@@ -53,7 +48,6 @@ function OrderSuccess() {
           </p>
         </div>
 
-        {/* Order Info */}
         <div className="mt-8 rounded-3xl bg-gray-50 p-5">
           <p className="text-sm font-semibold text-gray-500">Order ID</p>
           <p className="mt-1 break-all font-bold">{order._id}</p>
@@ -69,7 +63,6 @@ function OrderSuccess() {
           </p>
         </div>
 
-        {/* Summary */}
         <div className="mt-8">
           <h2 className="text-2xl font-extrabold">Order Summary</h2>
 
@@ -83,7 +76,6 @@ function OrderSuccess() {
           </p>
           <p className="mt-1 font-bold">{order.estimatedTime}</p>
 
-          {/* Items */}
           <div className="mt-4 space-y-3">
             {order.items?.map((item, index) => (
               <div
@@ -96,20 +88,18 @@ function OrderSuccess() {
                 </div>
 
                 <p className="font-bold">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ${Number(item.price * item.quantity).toFixed(2)}
                 </p>
               </div>
             ))}
           </div>
 
-          {/* Total */}
           <div className="mt-6 flex justify-between border-t pt-5 text-2xl font-extrabold">
             <span>Total</span>
             <span>${Number(order.totalAmount).toFixed(2)}</span>
           </div>
         </div>
 
-        {/* Actions */}
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             to="/"

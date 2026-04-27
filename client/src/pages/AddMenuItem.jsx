@@ -1,12 +1,11 @@
 import { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import API_URL from "../api";
-import { useAuth } from "../context/useAuth";
+import api from "../api";
+
 function AddMenuItem() {
   const navigate = useNavigate();
-  const { token } = useAuth();
+
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -15,15 +14,16 @@ function AddMenuItem() {
     image: "",
     available: true,
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -34,23 +34,16 @@ function AddMenuItem() {
     try {
       setIsSubmitting(true);
 
-      await axios.post(
-        `${API_URL}/api/menu`,
-        {
-          ...form,
-          price: Number(form.price),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      await api.post("/api/menu", {
+        ...form,
+        price: Number(form.price),
+      });
+
       toast.success("Item added");
       navigate("/admin");
     } catch (err) {
-      console.error("Add item error:", err);
-      toast.error("Failed to add item");
+      console.error("Add item error:", err.response?.data || err.message);
+      toast.error(err.response?.data?.message || "Failed to add item");
     } finally {
       setIsSubmitting(false);
     }

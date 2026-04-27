@@ -1,31 +1,33 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { useCart } from "../context/useCart";
-import API_URL from "../api";
+import { toast } from "react-toastify";
+import api from "../api";
+
 function MenuDetails() {
   const { id } = useParams();
   const { addToCart } = useCart();
 
   const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchItem = async () => {
-      const res = await axios.get(`${API_URL}/api/menu/${id}`);
-      setItem(res.data);
+      try {
+        const res = await api.get(`/api/menu/${id}`);
+        setItem(res.data);
+      } catch (err) {
+        console.error("Fetch item error:", err.response?.data || err.message);
+        toast.error("Failed to load menu item");
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchItem();
   }, [id]);
 
-  if (!item) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <p className="text-lg font-semibold">Loading...</p>
-      </div>
-    );
-  }
-  if (!item) {
+  if (loading) {
     return (
       <main className="mx-auto max-w-5xl px-4 py-8">
         <div className="h-[350px] animate-pulse rounded-3xl bg-gray-100" />
@@ -38,6 +40,23 @@ function MenuDetails() {
           </div>
 
           <div className="h-40 animate-pulse rounded-3xl bg-gray-100" />
+        </div>
+      </main>
+    );
+  }
+
+  if (!item) {
+    return (
+      <main className="mx-auto max-w-5xl px-4 py-8">
+        <Link
+          to="/"
+          className="text-sm font-medium text-gray-600 hover:underline"
+        >
+          ← Back
+        </Link>
+
+        <div className="mt-8 rounded-3xl border bg-white p-8 text-center">
+          <p className="text-gray-600">Menu item not found.</p>
         </div>
       </main>
     );
@@ -56,8 +75,10 @@ function MenuDetails() {
 
       <div className="w-full">
         <img
-          src={item.image}
-          alt={item.name}
+          src={
+            item.image || "https://via.placeholder.com/800x400?text=Menu+Item"
+          }
+          alt={item.name || "Menu item"}
           className="h-[300px] w-full object-cover md:h-[400px]"
         />
       </div>
@@ -66,7 +87,7 @@ function MenuDetails() {
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-sm font-medium text-green-600">
-              {item.category}
+              {item.category || "Menu"}
             </p>
 
             <h1 className="mt-1 text-3xl font-bold md:text-4xl">{item.name}</h1>
@@ -75,21 +96,26 @@ function MenuDetails() {
 
             <p
               className={`mt-3 text-sm font-semibold ${
-                item.available ? "text-green-600" : "text-red-500"
+                item.available === false ? "text-red-500" : "text-green-600"
               }`}
             >
-              {item.available ? "Available now" : "Currently unavailable"}
+              {item.available === false
+                ? "Currently unavailable"
+                : "Available now"}
             </p>
           </div>
 
           <div className="rounded-2xl border bg-white p-6 shadow-sm md:min-w-[250px]">
             <p className="text-2xl font-bold text-gray-900">
-              ${item.price.toFixed(2)}
+              ${Number(item.price).toFixed(2)}
             </p>
 
             <button
-              onClick={() => addToCart(item)}
-              disabled={!item.available}
+              onClick={() => {
+                addToCart(item);
+                toast.success(`${item.name} added to cart`);
+              }}
+              disabled={item.available === false}
               className="mt-4 w-full rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300"
             >
               Add to Cart

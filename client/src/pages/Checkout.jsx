@@ -1,14 +1,16 @@
 import { useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/useCart";
 import { useAuth } from "../context/useAuth";
 import { toast } from "react-toastify";
-import API_URL from "../api";
+import api from "../api";
+
 function Checkout() {
   const { cart } = useCart();
   const { token } = useAuth();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
     address: "",
@@ -24,8 +26,14 @@ function Checkout() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };const handleSubmit = async (e) => {
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!token) {
@@ -33,32 +41,22 @@ function Checkout() {
       return;
     }
 
-    setIsSubmitting(true); // ✅ move it HERE
+    setIsSubmitting(true);
 
     try {
-      const res = await axios.post(
-        `${API_URL}/api/payments/create-checkout-session`,
-        {
-          cart,
-          customer: form,
-          orderType: form.orderType,
-          estimatedTime:
-            form.orderType === "pickup"
-              ? "Ready in 15 minutes"
-              : "30–45 minutes",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const res = await api.post("/api/payments/create-checkout-session", {
+        cart,
+        customer: form,
+        orderType: form.orderType,
+        estimatedTime:
+          form.orderType === "pickup" ? "Ready in 15 minutes" : "30–45 minutes",
+      });
 
       window.location.href = res.data.url;
     } catch (err) {
+      console.error("Payment error:", err.response?.data || err.message);
+      toast.error(err.response?.data?.message || "Payment failed");
       setIsSubmitting(false);
-      console.error("Payment error:", err);
-      toast.error("Payment failed");
     }
   };
 
@@ -87,14 +85,12 @@ function Checkout() {
       <h1 className="mt-6 text-4xl font-extrabold">Checkout</h1>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-        {/* Form */}
         <form
           onSubmit={handleSubmit}
           className="rounded-3xl border bg-white p-6 shadow-sm"
         >
           <h2 className="text-2xl font-extrabold">Order details</h2>
 
-          {/* Order Type */}
           <div className="mt-6">
             <label className="mb-2 block text-sm font-semibold text-gray-700">
               Order type
@@ -111,7 +107,6 @@ function Checkout() {
             </select>
           </div>
 
-          {/* Info box */}
           {form.orderType === "pickup" ? (
             <div className="mt-4 rounded-2xl bg-green-50 p-4 text-green-700">
               <p className="font-bold">Pickup instructions</p>
@@ -126,7 +121,6 @@ function Checkout() {
             </div>
           )}
 
-          {/* Name */}
           <input
             name="name"
             placeholder="Full name"
@@ -135,6 +129,7 @@ function Checkout() {
             required
             className="mt-5 w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
           />
+
           <input
             name="email"
             type="email"
@@ -144,7 +139,7 @@ function Checkout() {
             required
             className="mt-5 w-full rounded-2xl border bg-gray-50 px-5 py-4 outline-none focus:border-green-600 focus:bg-white"
           />
-          {/* Address */}
+
           {form.orderType === "delivery" && (
             <input
               name="address"
@@ -156,7 +151,6 @@ function Checkout() {
             />
           )}
 
-          {/* Phone */}
           <input
             name="phone"
             placeholder="Phone number"
@@ -174,7 +168,6 @@ function Checkout() {
           </button>
         </form>
 
-        {/* Summary */}
         <aside className="h-fit rounded-3xl border bg-white p-6 shadow-sm">
           <h2 className="text-2xl font-extrabold">Order summary</h2>
 
