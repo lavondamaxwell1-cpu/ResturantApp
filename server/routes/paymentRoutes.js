@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Stripe = require("stripe");
-const { protect } = require("../middleware/authMiddleware");
+const protect = require("../middleware/authMiddleware");
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const Order = require("../models/Order");
