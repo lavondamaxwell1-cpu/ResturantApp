@@ -6,7 +6,9 @@ const protect = require("../middleware/authMiddleware");
 const adminOnly = require("../middleware/adminMiddleware");
 const sendEmail = require("../utils/sendEmail");
 
-// CREATE order
+//
+// 🔹 CREATE ORDER (fallback / non-Stripe)
+//
 router.post("/", protect, async (req, res) => {
   try {
     const { items, totalAmount, customer, orderType, estimatedTime } = req.body;
@@ -36,7 +38,9 @@ router.post("/", protect, async (req, res) => {
   }
 });
 
-// GET all orders - admin
+//
+// 🔹 GET ALL ORDERS (ADMIN)
+//
 router.get("/", protect, adminOnly, async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -47,7 +51,9 @@ router.get("/", protect, adminOnly, async (req, res) => {
   }
 });
 
-// GET my orders - customer
+//
+// 🔹 GET MY ORDERS (CUSTOMER)
+//
 router.get("/my-orders", protect, async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user.id }).sort({
@@ -61,21 +67,27 @@ router.get("/my-orders", protect, async (req, res) => {
   }
 });
 
-// UPDATE order status - admin
+//
+// 🔹 UPDATE ORDER STATUS (ADMIN)
+//
 router.put("/:id/status", protect, adminOnly, async (req, res) => {
   try {
+     console.log("🔥 STATUS ROUTE HIT");
+     console.log("ORDER ID:", req.params.id);
+     console.log("NEW STATUS:", req.body.status);
     const { status } = req.body;
 
     const order = await Order.findByIdAndUpdate(
       req.params.id,
-      { status },
-      { new: true, runValidators: true },
+      { $set: { status } },
+      { new: true, runValidators: true }
     );
-
+    console.log("UPDATED ORDER:", order);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
+    // 🔔 Send email when ready
     if (status === "ready" && order.customer?.email) {
       await sendEmail({
         to: order.customer.email,
@@ -101,7 +113,9 @@ router.put("/:id/status", protect, adminOnly, async (req, res) => {
   }
 });
 
-// GET single order
+//
+// 🔹 GET SINGLE ORDER
+//
 router.get("/:id", protect, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);

@@ -27,23 +27,26 @@ function AdminOrders() {
     if (token) fetchOrders();
   }, [token]);
 
-  const handleStatusChange = async (orderId, newStatus) => {
-    try {
+ const handleStatusChange = async (orderId, newStatus) => {
+   try {
+     console.log("🚀 Sending update:", orderId, newStatus);
+
      const res = await api.put(`/api/orders/${orderId}/status`, {
        status: newStatus,
      });
 
-      setOrders((prev) =>
-        prev.map((order) => (order._id === orderId ? res.data : order)),
-      );
+     console.log("✅ Response from backend:", res.data);
 
-      toast.success("Order status updated");
-    } catch (err) {
-      console.error("Update status error:", err);
-      toast.error("Failed to update order status");
-    }
-  };
+     setOrders((prev) =>
+       prev.map((order) => (order._id === orderId ? res.data : order)),
+     );
 
+     toast.success("Order status updated");
+   } catch (err) {
+     console.error("❌ Update error:", err.response?.data || err.message);
+     toast.error("Failed to update order status");
+   }
+ };
   if (loading) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-8">
