@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useCart } from "../context/useCart";
+import { useAuth } from "../context/useAuth";
+import { toast } from "react-toastify";
 import api from "../api";
 
 function OrderSuccess() {
   const { id } = useParams();
   const { clearCart } = useCart();
+  const { token } = useAuth();
 
   const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -17,16 +21,34 @@ function OrderSuccess() {
         clearCart();
       } catch (err) {
         console.error("Fetch order error:", err.response?.data || err.message);
+        toast.error("Failed to load order");
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (id) fetchOrder();
-  }, [id, clearCart]);
+    // ✅ Wait for token before calling API
+    if (id && token) {
+      fetchOrder();
+    }
+  }, [id, token, clearCart]);
 
-  if (!order) {
+  // 🔄 Loading state
+  if (loading) {
     return (
       <main className="flex min-h-[70vh] items-center justify-center">
         <p className="text-lg font-semibold">Loading your order...</p>
+      </main>
+    );
+  }
+
+  // ❌ No order found
+  if (!order) {
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-12">
+        <div className="rounded-3xl border bg-white p-8 text-center">
+          <p className="text-gray-600">Order not found.</p>
+        </div>
       </main>
     );
   }
@@ -48,6 +70,7 @@ function OrderSuccess() {
           </p>
         </div>
 
+        {/* Order Info */}
         <div className="mt-8 rounded-3xl bg-gray-50 p-5">
           <p className="text-sm font-semibold text-gray-500">Order ID</p>
           <p className="mt-1 break-all font-bold">{order._id}</p>
@@ -63,6 +86,7 @@ function OrderSuccess() {
           </p>
         </div>
 
+        {/* Summary */}
         <div className="mt-8">
           <h2 className="text-2xl font-extrabold">Order Summary</h2>
 
@@ -76,6 +100,7 @@ function OrderSuccess() {
           </p>
           <p className="mt-1 font-bold">{order.estimatedTime}</p>
 
+          {/* Items */}
           <div className="mt-4 space-y-3">
             {order.items?.map((item, index) => (
               <div
@@ -94,12 +119,14 @@ function OrderSuccess() {
             ))}
           </div>
 
+          {/* Total */}
           <div className="mt-6 flex justify-between border-t pt-5 text-2xl font-extrabold">
             <span>Total</span>
             <span>${Number(order.totalAmount).toFixed(2)}</span>
           </div>
         </div>
 
+        {/* Actions */}
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             to="/"
