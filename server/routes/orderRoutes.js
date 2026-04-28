@@ -6,9 +6,7 @@ const protect = require("../middleware/authMiddleware");
 const adminOnly = require("../middleware/adminMiddleware");
 const sendEmail = require("../utils/sendEmail");
 
-//
-// 🔹 CREATE ORDER (fallback / non-Stripe)
-//
+// CREATE ORDER
 router.post("/", protect, async (req, res) => {
   try {
     const { items, totalAmount, customer, orderType, estimatedTime } = req.body;
@@ -28,19 +26,14 @@ router.post("/", protect, async (req, res) => {
       status: "pending",
     });
 
-    res.status(201).json({
-      message: "Order created successfully",
-      order,
-    });
+    res.status(201).json({ message: "Order created successfully", order });
   } catch (err) {
     console.error("Create order error:", err);
     res.status(500).json({ message: "Error creating order" });
   }
 });
 
-//
-// 🔹 GET ALL ORDERS (ADMIN)
-//
+// GET ALL ORDERS - ADMIN
 router.get("/", protect, adminOnly, async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -51,9 +44,7 @@ router.get("/", protect, adminOnly, async (req, res) => {
   }
 });
 
-//
-// 🔹 GET MY ORDERS (CUSTOMER)
-//
+// GET MY ORDERS - CUSTOMER
 router.get("/my-orders", protect, async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user.id }).sort({
@@ -67,14 +58,9 @@ router.get("/my-orders", protect, async (req, res) => {
   }
 });
 
-//
-// 🔹 UPDATE ORDER STATUS (ADMIN)
-//
+// UPDATE ORDER STATUS - ADMIN
 router.put("/:id/status", protect, adminOnly, async (req, res) => {
   try {
-    console.log("🔥 STATUS ROUTE HIT");
-    console.log("ORDER ID:", req.params.id);
-    console.log("NEW STATUS:", req.body.status);
     const { status } = req.body;
 
     const order = await Order.findByIdAndUpdate(
@@ -82,32 +68,11 @@ router.put("/:id/status", protect, adminOnly, async (req, res) => {
       { $set: { status } },
       { new: true, runValidators: true },
     );
-    console.log("UPDATED ORDER:", order);
+
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-    // UPDATE payment status
-    router.put("/:id/payment-status", protect, adminOnly, async (req, res) => {
-      try {
-        const { paymentStatus } = req.body;
 
-        const order = await Order.findByIdAndUpdate(
-          req.params.id,
-          { $set: { paymentStatus } },
-          { new: true, runValidators: true },
-        );
-
-        if (!order) {
-          return res.status(404).json({ message: "Order not found" });
-        }
-
-        res.json(order);
-      } catch (err) {
-        console.error("Update payment status error:", err);
-        res.status(500).json({ message: "Error updating payment status" });
-      }
-    });
-    // 🔔 Send email when ready
     if (status === "ready" && order.customer?.email) {
       await sendEmail({
         to: order.customer.email,
@@ -133,9 +98,29 @@ router.put("/:id/status", protect, adminOnly, async (req, res) => {
   }
 });
 
-//
-// 🔹 GET SINGLE ORDER
-//
+// UPDATE PAYMENT STATUS - ADMIN
+router.put("/:id/payment-status", protect, adminOnly, async (req, res) => {
+  try {
+    const { paymentStatus } = req.body;
+
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { $set: { paymentStatus } },
+      { new: true, runValidators: true },
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json(order);
+  } catch (err) {
+    console.error("Update payment status error:", err);
+    res.status(500).json({ message: "Error updating payment status" });
+  }
+});
+
+// GET SINGLE ORDER - keep this LAST
 router.get("/:id", protect, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
