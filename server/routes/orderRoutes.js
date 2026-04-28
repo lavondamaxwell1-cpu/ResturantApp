@@ -72,21 +72,41 @@ router.get("/my-orders", protect, async (req, res) => {
 //
 router.put("/:id/status", protect, adminOnly, async (req, res) => {
   try {
-     console.log("🔥 STATUS ROUTE HIT");
-     console.log("ORDER ID:", req.params.id);
-     console.log("NEW STATUS:", req.body.status);
+    console.log("🔥 STATUS ROUTE HIT");
+    console.log("ORDER ID:", req.params.id);
+    console.log("NEW STATUS:", req.body.status);
     const { status } = req.body;
 
     const order = await Order.findByIdAndUpdate(
       req.params.id,
       { $set: { status } },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     console.log("UPDATED ORDER:", order);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
+    // UPDATE payment status
+    router.put("/:id/payment-status", protect, adminOnly, async (req, res) => {
+      try {
+        const { paymentStatus } = req.body;
 
+        const order = await Order.findByIdAndUpdate(
+          req.params.id,
+          { $set: { paymentStatus } },
+          { new: true, runValidators: true },
+        );
+
+        if (!order) {
+          return res.status(404).json({ message: "Order not found" });
+        }
+
+        res.json(order);
+      } catch (err) {
+        console.error("Update payment status error:", err);
+        res.status(500).json({ message: "Error updating payment status" });
+      }
+    });
     // 🔔 Send email when ready
     if (status === "ready" && order.customer?.email) {
       await sendEmail({

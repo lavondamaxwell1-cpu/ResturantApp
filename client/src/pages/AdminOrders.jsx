@@ -47,6 +47,22 @@ function AdminOrders() {
      toast.error("Failed to update order status");
    }
  };
+ const handlePaymentStatusChange = async (orderId, newPaymentStatus) => {
+   try {
+     const res = await api.put(`/api/orders/${orderId}/payment-status`, {
+       paymentStatus: newPaymentStatus,
+     });
+
+     setOrders((prev) =>
+       prev.map((order) => (order._id === orderId ? res.data : order)),
+     );
+
+     toast.success("Payment status updated");
+   } catch (err) {
+     console.error("Update payment error:", err.response?.data || err.message);
+     toast.error("Failed to update payment status");
+   }
+ };
   if (loading) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-8">
@@ -115,6 +131,16 @@ function AdminOrders() {
                   <option value="preparing">Preparing</option>
                   <option value="ready">Ready</option>
                   <option value="completed">Completed</option>
+                </select>
+                <select
+                  value={order.paymentStatus}
+                  onChange={(e) =>
+                    handlePaymentStatusChange(order._id, e.target.value)
+                  }
+                  className="rounded-full border bg-gray-50 px-4 py-2 font-bold"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="paid">Paid</option>
                 </select>
               </div>
 
