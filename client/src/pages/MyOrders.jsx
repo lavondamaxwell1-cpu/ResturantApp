@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import socket from "../socket";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/useAuth";
@@ -24,6 +24,21 @@ useEffect(() => {
     fetchOrders();
   }
 }, [token]);
+useEffect(() => {
+  const handleOrderUpdated = (updatedOrder) => {
+    setOrders((prev) =>
+      prev.map((order) =>
+        order._id === updatedOrder._id ? updatedOrder : order,
+      ),
+    );
+  };
+
+  socket.on("orderUpdated", handleOrderUpdated);
+
+  return () => {
+    socket.off("orderUpdated", handleOrderUpdated);
+  };
+}, []);
 
   if (!token) {
     return (

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/useAuth";
-
+import socket from "../socket";
 import api from "../api";
 function AdminOrders() {
   const { token } = useAuth();
@@ -26,7 +26,21 @@ function AdminOrders() {
 
     if (token) fetchOrders();
   }, [token]);
+useEffect(() => {
+  const handleOrderUpdated = (updatedOrder) => {
+    setOrders((prev) =>
+      prev.map((order) =>
+        order._id === updatedOrder._id ? updatedOrder : order
+      )
+    );
+  };
 
+  socket.on("orderUpdated", handleOrderUpdated);
+
+  return () => {
+    socket.off("orderUpdated", handleOrderUpdated);
+  };
+}, []);
  const handleStatusChange = async (orderId, newStatus) => {
    try {
      console.log("🚀 Sending update:", orderId, newStatus);
