@@ -66,7 +66,7 @@ router.put("/:id/status", protect, adminOnly, async (req, res) => {
     const order = await Order.findByIdAndUpdate(
       req.params.id,
       { $set: { status } },
-      { new: true, runValidators: true },
+      { returnDocument: "after", runValidators: true },
     );
 
     if (!order) {
@@ -90,7 +90,11 @@ router.put("/:id/status", protect, adminOnly, async (req, res) => {
         `,
       });
     }
+    const io = req.app.get("io");
 
+    if (io) {
+      io.emit("orderUpdated", order);
+    }
     res.json(order);
   } catch (err) {
     console.error("Update order status error:", err);
@@ -106,12 +110,19 @@ router.put("/:id/payment-status", protect, adminOnly, async (req, res) => {
     const order = await Order.findByIdAndUpdate(
       req.params.id,
       { $set: { paymentStatus } },
-      { new: true, runValidators: true },
+      { returnDocument: "after", runValidators: true },
     );
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
+    const io = req.app.get("io");
+
+    if (io) {
+      io.emit("orderUpdated", order);
+    }
+
+    res.json(order);
 
     res.json(order);
   } catch (err) {
