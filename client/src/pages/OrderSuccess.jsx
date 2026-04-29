@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useCart } from "../context/useCart";
-
+import OrderProgress from "../components/OrderProgress";
 import { toast } from "react-toastify";
 import api from "../api";
 
@@ -9,28 +9,27 @@ function OrderSuccess() {
   const { id } = useParams();
   const { clearCart } = useCart();
 
-
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
- useEffect(() => {
-   const fetchOrder = async () => {
-     try {
-       const res = await api.get(`/api/orders/${id}`);
-       setOrder(res.data);
-       clearCart();
-     } catch (err) {
-       console.error("Fetch order error:", err.response?.data || err.message);
-       toast.error("Failed to load order");
-     } finally {
-       setLoading(false);
-     }
-   };
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const res = await api.get(`/api/orders/${id}`);
+        setOrder(res.data);
+        clearCart();
+      } catch (err) {
+        console.error("Fetch order error:", err.response?.data || err.message);
+        toast.error("Failed to load order");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-   if (id) {
-     fetchOrder();
-   }
- }, [id, clearCart]);
+    if (id) {
+      fetchOrder();
+    }
+  }, [id, clearCart]);
   // 🔄 Loading state
   if (loading) {
     return (
@@ -77,6 +76,7 @@ function OrderSuccess() {
           <p className="mt-1 font-bold capitalize text-green-600">
             {order.status}
           </p>
+          <OrderProgress status={order.status} />
 
           <p className="mt-5 text-sm font-semibold text-gray-500">Payment</p>
           <p className="mt-1 font-bold capitalize text-green-600">

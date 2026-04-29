@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/useAuth";
 import api from "../api";
-
+import OrderProgress from "../components/OrderProgress";
 function MyOrders() {
   const { token } = useAuth();
   const [orders, setOrders] = useState([]);
@@ -90,7 +90,7 @@ useEffect(() => {
                         {order.status}
                       </span>
                     </p>
-
+                    <OrderProgress status={order.status} />
                     <p>
                       Type:{" "}
                       <span className="font-semibold capitalize text-green-600">
