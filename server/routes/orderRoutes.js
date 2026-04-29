@@ -132,7 +132,7 @@ router.put("/:id/payment-status", protect, adminOnly, async (req, res) => {
 });
 
 // GET SINGLE ORDER - keep this LAST
-router.get("/:id", protect, async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
 

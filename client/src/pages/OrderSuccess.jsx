@@ -1,38 +1,36 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useCart } from "../context/useCart";
-import { useAuth } from "../context/useAuth";
+
 import { toast } from "react-toastify";
 import api from "../api";
 
 function OrderSuccess() {
   const { id } = useParams();
   const { clearCart } = useCart();
-  const { token } = useAuth();
+
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const res = await api.get(`/api/orders/${id}`);
-        setOrder(res.data);
-        clearCart();
-      } catch (err) {
-        console.error("Fetch order error:", err.response?.data || err.message);
-        toast.error("Failed to load order");
-      } finally {
-        setLoading(false);
-      }
-    };
+ useEffect(() => {
+   const fetchOrder = async () => {
+     try {
+       const res = await api.get(`/api/orders/${id}`);
+       setOrder(res.data);
+       clearCart();
+     } catch (err) {
+       console.error("Fetch order error:", err.response?.data || err.message);
+       toast.error("Failed to load order");
+     } finally {
+       setLoading(false);
+     }
+   };
 
-    // ✅ Wait for token before calling API
-    if (id && token) {
-      fetchOrder();
-    }
-  }, [id, token, clearCart]);
-
+   if (id) {
+     fetchOrder();
+   }
+ }, [id, clearCart]);
   // 🔄 Loading state
   if (loading) {
     return (
